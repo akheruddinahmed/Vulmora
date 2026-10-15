@@ -11,6 +11,7 @@ service cloud.firestore {
       return isAuthenticated() && (
         request.auth.token.admin == true ||
         request.auth.token.role == 'admin' ||
+        request.auth.token.email in ['admin@gmail.com', 'akheruddinahmed@gmail.com', 'admin@vulmora.in', 'owner@vulmora.in'] ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
@@ -78,7 +79,7 @@ service cloud.firestore {
     // Authenticated users can check if their own UID is registered; Only Superadmins can write
     match /admins/{adminId} {
       allow read: if isAuthenticated() && (request.auth.uid == adminId || isAdmin());
-      allow write: if false; // Managed via Firebase Admin SDK or Console
+      allow write: if isAdmin();
     }
 
     // 7. Inventory Logs:
@@ -88,6 +89,13 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isAuthenticated();
       allow update, delete: if false;
+    }
+
+    // 8. Inquiries / Contact Messages:
+    // Anyone (guests and customers) can submit an inquiry; Admins can review
+    match /inquiries/{inquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

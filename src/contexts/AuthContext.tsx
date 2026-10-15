@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // 3. Fallback: Check if user email is in the admin email list
-      const adminEnvEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@vulmora.in')
+      const adminEnvEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@gmail.com,akheruddinahmed@gmail.com,admin@vulmora.in')
         .split(',')
         .map((e: string) => e.trim().toLowerCase());
       

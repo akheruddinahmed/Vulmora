@@ -102,6 +102,22 @@ export const Navbar: React.FC = () => {
             >
               Categories
             </Link>
+            <Link
+              to="/about"
+              className={`transition-colors ${
+                isActive('/about') ? 'text-blue-900 font-extrabold' : 'hover:text-blue-900'
+              }`}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/contact"
+              className={`transition-colors ${
+                isActive('/contact') ? 'text-blue-900 font-extrabold' : 'hover:text-blue-900'
+              }`}
+            >
+              Contact Us
+            </Link>
             {currentUser && (
               <Link
                 to="/orders"
@@ -268,6 +284,20 @@ export const Navbar: React.FC = () => {
               className="px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100"
             >
               Categories
+            </Link>
+            <Link
+              to="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100"
+            >
+              About Us
+            </Link>
+            <Link
+              to="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100"
+            >
+              Contact Us
             </Link>
             {currentUser && (
               <Link

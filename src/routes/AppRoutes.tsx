@@ -40,6 +40,12 @@ const RegisterPage = lazy(() =>
 const ForgotPasswordPage = lazy(() =>
   import('@/pages/auth/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage }))
 );
+const AboutUsPage = lazy(() =>
+  import('@/pages/about/AboutUsPage').then((m) => ({ default: m.AboutUsPage }))
+);
+const ContactUsPage = lazy(() =>
+  import('@/pages/contact/ContactUsPage').then((m) => ({ default: m.ContactUsPage }))
+);
 
 // Lazy-loaded Admin Pages
 const AdminLoginPage = lazy(() =>
@@ -94,6 +100,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success/:id" element={<OrderSuccessPage />} />
           <Route path="/orders" element={<MyOrdersPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/contact" element={<ContactUsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

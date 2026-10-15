@@ -119,6 +119,16 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/about" className="hover:text-white transition-colors">
+                  About VULMORA
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors">
+                  Contact Customer Care
+                </Link>
+              </li>
+              <li>
                 <Link to="/orders" className="hover:text-white transition-colors">
                   Track My COD Order
                 </Link>
