@@ -14,6 +14,7 @@ import {
   X,
   ShieldCheck,
   ChevronRight,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
@@ -33,6 +34,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Categories', path: '/admin/categories', icon: Layers },
     { label: 'Orders', path: '/admin/orders', icon: ShoppingBag },
     { label: 'Customers', path: '/admin/customers', icon: Users },
+    { label: 'Inquiries', path: '/admin/inquiries', icon: MessageSquare },
     { label: 'Inventory Audit', path: '/admin/inventory', icon: Warehouse },
     { label: 'Store Settings', path: '/admin/settings', icon: Settings },
   ];

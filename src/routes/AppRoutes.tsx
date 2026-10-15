@@ -78,6 +78,9 @@ const AdminInventoryPage = lazy(() =>
 const AdminSettingsPage = lazy(() =>
   import('@/pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage }))
 );
+const AdminInquiriesPage = lazy(() =>
+  import('@/pages/admin/AdminInquiriesPage').then((m) => ({ default: m.AdminInquiriesPage }))
+);
 
 const RouteLoadingFallback = () => (
   <div className="min-h-[50vh] flex flex-col items-center justify-center gap-3 p-8">
@@ -128,6 +131,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />
+          <Route path="inquiries" element={<AdminInquiriesPage />} />
           <Route path="inventory" element={<AdminInventoryPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
