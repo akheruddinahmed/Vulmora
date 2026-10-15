@@ -18,11 +18,11 @@ interface AuthContextType {
   profile: UserProfile | null;
   isAdmin: boolean;
   isLoading: boolean;
-  login: (email: string, pass: string) => Promise<void>;
+  login: (email: string, pass: string) => Promise<boolean>;
   register: (fullName: string, email: string, pass: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-  refreshAdminStatus: () => Promise<boolean>;
+  refreshAdminStatus: (user?: User | null) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -117,12 +117,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, pass: string) => {
+  const login = async (email: string, pass: string): Promise<boolean> => {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, pass);
+      setCurrentUser(cred.user);
       const adminStatus = await verifyAdminPrivileges(cred.user);
       setIsAdmin(adminStatus);
       await loadUserProfile(cred.user);
+      return adminStatus;
     } catch (err: any) {
       const msg = getFriendlyAuthErrorMessage(err.code) || err.message;
       error('Login Failed', msg);
@@ -171,9 +173,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const refreshAdminStatus = async (): Promise<boolean> => {
-    if (!currentUser) return false;
-    const adminStatus = await verifyAdminPrivileges(currentUser);
+  const refreshAdminStatus = async (user?: User | null): Promise<boolean> => {
+    const targetUser = user || currentUser || auth.currentUser;
+    if (!targetUser) return false;
+    const adminStatus = await verifyAdminPrivileges(targetUser);
     setIsAdmin(adminStatus);
     return adminStatus;
   };

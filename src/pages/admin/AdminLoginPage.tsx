@@ -12,7 +12,7 @@ export const AdminLoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/admin/dashboard';
 
-  const { login, refreshAdminStatus } = useAuth();
+  const { login, logout } = useAuth();
   const { success, error } = useToast();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,13 +29,13 @@ export const AdminLoginPage: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      await login(data.email, data.password);
-      const isAdm = await refreshAdminStatus();
+      const isAdm = await login(data.email, data.password);
 
       if (isAdm) {
         success('Administrator Authenticated', 'Access granted to admin workspace.');
-        navigate(redirectPath);
+        navigate(redirectPath, { replace: true });
       } else {
+        await logout();
         error(
           'Insufficient Permissions',
           'This account does not have administrator privileges. Please contact the store owner.'
