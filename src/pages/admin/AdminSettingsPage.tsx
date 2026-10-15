@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Database, ShieldCheck, Truck, RefreshCw, Layers, Cloud, Key, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
+import { Save, Database, ShieldCheck, Truck, RefreshCw, Layers, Cloud, Key, CheckCircle2, AlertCircle, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { seedInitialFirestoreData } from '@/services/seed/seedDataService';
 import { useToast } from '@/contexts/ToastContext';
 import { StoreSettings } from '@/types/settings';
 import { isFirebaseConfigured } from '@/services/firebase/config';
+import { getCloudinaryCredentials, setCloudinaryCredentials, testCloudinaryConnection } from '@/services/cloudinary/cloudinaryService';
 
 export const AdminSettingsPage: React.FC = () => {
   const { settings, updateSettings, isLoading } = useStoreSettings();
@@ -13,10 +14,16 @@ export const AdminSettingsPage: React.FC = () => {
   const [formData, setFormData] = useState<StoreSettings>(settings);
   const [isSaving, setIsSaving] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isTestingCloudinary, setIsTestingCloudinary] = useState(false);
 
   useEffect(() => {
     if (settings) {
-      setFormData(settings);
+      const { cloudName, uploadPreset } = getCloudinaryCredentials();
+      setFormData({
+        ...settings,
+        cloudinaryCloudName: settings.cloudinaryCloudName || cloudName || '',
+        cloudinaryUploadPreset: settings.cloudinaryUploadPreset || uploadPreset || '',
+      });
     }
   }, [settings]);
 
@@ -34,11 +41,40 @@ export const AdminSettingsPage: React.FC = () => {
     }));
   };
 
+  const handleTestCloudinary = async () => {
+    if (!formData.cloudinaryCloudName || !formData.cloudinaryUploadPreset) {
+      error('Configuration Missing', 'Please enter both Cloud Name and Unsigned Upload Preset to test.');
+      return;
+    }
+
+    setIsTestingCloudinary(true);
+    try {
+      const res = await testCloudinaryConnection(
+        formData.cloudinaryCloudName,
+        formData.cloudinaryUploadPreset
+      );
+      if (res.success) {
+        success('Cloudinary Verified', res.message);
+        setCloudinaryCredentials(formData.cloudinaryCloudName, formData.cloudinaryUploadPreset);
+      } else {
+        error('Cloudinary Test Failed', res.message);
+      }
+    } finally {
+      setIsTestingCloudinary(false);
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
       await updateSettings(formData);
+      if (formData.cloudinaryCloudName || formData.cloudinaryUploadPreset) {
+        setCloudinaryCredentials(
+          formData.cloudinaryCloudName || '',
+          formData.cloudinaryUploadPreset || ''
+        );
+      }
     } catch {
       // toast shown in context
     } finally {
@@ -348,6 +384,90 @@ VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
 VITE_FIREBASE_APP_ID=1:123456789012:web:...`}
             </pre>
+          </div>
+        </div>
+
+        {/* Section 6: Cloudinary Media Storage */}
+        <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <ImageIcon className="w-5 h-5 text-purple-400" />
+              <div>
+                <h3 className="text-sm font-bold text-white">6. Cloudinary Media Storage</h3>
+                <p className="text-xs text-slate-400">
+                  CDN image hosting for product packaging photographs and catalog banners
+                </p>
+              </div>
+            </div>
+
+            {formData.cloudinaryCloudName && formData.cloudinaryUploadPreset ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Configured
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Requires Cloud Credentials
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1">
+              <label className="font-semibold text-slate-300">Cloudinary Cloud Name</label>
+              <input
+                type="text"
+                placeholder="e.g. dxyz1234 or your_cloud_name"
+                value={formData.cloudinaryCloudName || ''}
+                onChange={(e) => handleChange('cloudinaryCloudName', e.target.value.trim())}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-purple-500 font-mono text-xs"
+              />
+              <p className="text-[11px] text-slate-500">Found in your Cloudinary Dashboard under Cloud name.</p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-semibold text-slate-300">Unsigned Upload Preset</label>
+              <input
+                type="text"
+                placeholder="e.g. vulmora_preset or ml_default"
+                value={formData.cloudinaryUploadPreset || ''}
+                onChange={(e) => handleChange('cloudinaryUploadPreset', e.target.value.trim())}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-purple-500 font-mono text-xs"
+              />
+              <p className="text-[11px] text-slate-500">Must have signing mode set to <strong>Unsigned</strong>.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <button
+              type="button"
+              onClick={handleTestCloudinary}
+              disabled={isTestingCloudinary || !formData.cloudinaryCloudName || !formData.cloudinaryUploadPreset}
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-md shrink-0 disabled:opacity-40 flex items-center gap-2"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isTestingCloudinary ? 'animate-spin' : ''}`} />
+              <span>{isTestingCloudinary ? 'Testing Upload...' : 'Test Cloudinary Connection'}</span>
+            </button>
+
+            <a
+              href="https://console.cloudinary.com/settings/upload"
+              target="_blank"
+              rel="noreferrer"
+              className="text-purple-400 hover:text-purple-300 inline-flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <span>Manage Upload Presets in Cloudinary</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2 text-xs">
+            <span className="font-semibold text-slate-300 block">Quick 3-step setup guide:</span>
+            <ol className="list-decimal list-inside space-y-1 text-slate-400 text-[11px] leading-relaxed">
+              <li>Sign up for a free account at <a href="https://cloudinary.com" target="_blank" rel="noreferrer" className="text-purple-400 underline">cloudinary.com</a>.</li>
+              <li>Go to <strong>Settings (Gear Icon) &gt; Upload &gt; Upload presets &gt; Add upload preset</strong>.</li>
+              <li>Set <strong>Signing Mode</strong> to <strong>Unsigned</strong>, copy the Preset name, and paste your Cloud Name and Preset above.</li>
+            </ol>
           </div>
         </div>
 

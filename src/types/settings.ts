@@ -12,6 +12,8 @@ export interface StoreSettings {
   lowStockThreshold: number;
   maintenanceMode: boolean;
   announcement?: string;
+  cloudinaryCloudName?: string;
+  cloudinaryUploadPreset?: string;
   policies: {
     returnPolicy: string;
     privacyPolicy: string;
@@ -34,6 +36,8 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   lowStockThreshold: 5,
   maintenanceMode: false,
   announcement: '✨ 100% Cash on Delivery (COD) available on all VULMORA household & personal care orders across India!',
+  cloudinaryCloudName: '',
+  cloudinaryUploadPreset: '',
   policies: {
     returnPolicy: 'We offer an easy 7-day return policy for unopened and undamaged VULMORA packs. Cash on Delivery refunds are processed directly upon doorstep courier pickup.',
     privacyPolicy: 'VULMORA respects your privacy. We only collect customer delivery address and phone details strictly necessary to dispatch and fulfill Cash on Delivery parcels.',

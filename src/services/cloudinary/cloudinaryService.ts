@@ -1,6 +1,3 @@
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'vulmora';
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'vulmora_preset';
-
 export interface CloudinaryUploadResult {
   url: string;
   secure_url: string;
@@ -17,6 +14,100 @@ export interface ImageTransformOptions {
   crop?: 'fill' | 'fit' | 'thumb' | 'scale' | 'pad';
   quality?: 'auto' | 'auto:best' | 'auto:good' | 'auto:eco' | 'auto:low';
   format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
+}
+
+/**
+ * Retrieves the currently active Cloudinary configuration,
+ * checking runtime storage or environment variables.
+ */
+export function getCloudinaryCredentials(): { cloudName: string; uploadPreset: string } {
+  let cloudName = '';
+  let uploadPreset = '';
+
+  if (typeof window !== 'undefined') {
+    cloudName = localStorage.getItem('vulmora_cloudinary_cloud_name') || '';
+    uploadPreset = localStorage.getItem('vulmora_cloudinary_preset') || '';
+  }
+
+  if (!cloudName) {
+    cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
+  }
+  if (!uploadPreset) {
+    uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
+  }
+
+  return { cloudName: cloudName.trim(), uploadPreset: uploadPreset.trim() };
+}
+
+/**
+ * Persists runtime Cloudinary credentials in local browser storage
+ */
+export function setCloudinaryCredentials(cloudName: string, uploadPreset: string): void {
+  if (typeof window !== 'undefined') {
+    if (cloudName) {
+      localStorage.setItem('vulmora_cloudinary_cloud_name', cloudName.trim());
+    } else {
+      localStorage.removeItem('vulmora_cloudinary_cloud_name');
+    }
+
+    if (uploadPreset) {
+      localStorage.setItem('vulmora_cloudinary_preset', uploadPreset.trim());
+    } else {
+      localStorage.removeItem('vulmora_cloudinary_preset');
+    }
+  }
+}
+
+/**
+ * Tests connection to Cloudinary with an unsigned upload preset
+ */
+export async function testCloudinaryConnection(
+  cloudName: string,
+  uploadPreset: string
+): Promise<{ success: boolean; message: string }> {
+  const cName = cloudName.trim();
+  const preset = uploadPreset.trim();
+
+  if (!cName || !preset) {
+    return {
+      success: false,
+      message: 'Both Cloud Name and Unsigned Upload Preset are required to connect.',
+    };
+  }
+
+  try {
+    // 1x1 transparent GIF base64 test pixel
+    const testDataUri = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    const formData = new FormData();
+    formData.append('file', testDataUri);
+    formData.append('upload_preset', preset);
+    formData.append('folder', 'vulmora_store/test_connection');
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cName}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (res.ok && data.secure_url) {
+      return {
+        success: true,
+        message: `Cloudinary verified! Upload successful to cloud "${cName}".`,
+      };
+    } else {
+      return {
+        success: false,
+        message:
+          data.error?.message ||
+          `Cloudinary rejected test upload (HTTP ${res.status}). Verify your Upload Preset is set to "Unsigned".`,
+      };
+    }
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.message || 'Network error connecting to Cloudinary endpoint.',
+    };
+  }
 }
 
 /**
@@ -61,56 +152,33 @@ export async function uploadToCloudinary(
   folder: string = 'products',
   onProgress?: (progressPercent: number) => void
 ): Promise<CloudinaryUploadResult> {
+  const { cloudName, uploadPreset } = getCloudinaryCredentials();
+
   // Validate file type
   const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
   if (!validTypes.includes(file.type)) {
     throw new Error('Unsupported file format. Please upload JPG, PNG, WEBP, or AVIF.');
   }
 
-  // Validate file size (max 8MB)
-  const MAX_SIZE_BYTES = 8 * 1024 * 1024;
+  // Validate file size (max 10MB)
+  const MAX_SIZE_BYTES = 10 * 1024 * 1024;
   if (file.size > MAX_SIZE_BYTES) {
-    throw new Error('Image size exceeds 8MB limit. Please compress or select a smaller image.');
+    throw new Error('Image size exceeds 10MB limit. Please compress or select a smaller image.');
   }
 
-  // If running in development without configured upload preset
-  if (
-    !import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ||
-    !import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
-  ) {
-    // Graceful fallback to client Object URL / Base64 for instant testing without setup friction
-    return new Promise((resolve) => {
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        currentProgress += 25;
-        if (onProgress) onProgress(currentProgress);
-        if (currentProgress >= 100) {
-          clearInterval(interval);
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const dataUrl = e.target?.result as string;
-            resolve({
-              url: dataUrl,
-              secure_url: dataUrl,
-              public_id: `local_dev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-              format: file.type.split('/')[1] || 'png',
-              width: 800,
-              height: 800,
-              bytes: file.size,
-            });
-          };
-          reader.readAsDataURL(file);
-        }
-      }, 150);
-    });
+  // Check if Cloudinary is configured
+  if (!cloudName || !uploadPreset || cloudName === 'your_cloudinary_cloud_name') {
+    throw new Error(
+      'Cloudinary credentials are not configured. Please enter your Cloud Name and Unsigned Upload Preset in Admin > Settings.'
+    );
   }
 
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  formData.append('upload_preset', uploadPreset);
   formData.append('folder', `vulmora_store/${folder}`);
 
-  const uploadEndpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+  const uploadEndpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -136,12 +204,8 @@ export async function uploadToCloudinary(
       } else {
         try {
           const errorResponse = JSON.parse(xhr.responseText);
-          reject(
-            new Error(
-              errorResponse.error?.message ||
-                `Cloudinary upload failed with status ${xhr.status}`
-            )
-          );
+          const errorMsg = errorResponse.error?.message || `Upload failed with status ${xhr.status}`;
+          reject(new Error(errorMsg));
         } catch {
           reject(new Error(`Cloudinary upload failed with status ${xhr.status}`));
         }
@@ -149,7 +213,7 @@ export async function uploadToCloudinary(
     };
 
     xhr.onerror = () => {
-      reject(new Error('Network error during image upload to Cloudinary.'));
+      reject(new Error('Network error during image upload to Cloudinary. Check connection.'));
     };
 
     xhr.send(formData);
