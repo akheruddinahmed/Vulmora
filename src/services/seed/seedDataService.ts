@@ -7,21 +7,21 @@ export const VULMORA_CATEGORIES = [
     name: 'Laundry Care',
     slug: 'laundry-care',
     description: 'High-efficacy laundry washing powders for everyday clothes washing and stain removal.',
-    imageUrl: '/images/products/vulmora-washing-powder.jpg',
+    imageUrl: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052371/vulmora_store/products/vulmora-washing-powder.jpg',
     status: 'active' as const,
   },
   {
     name: 'Floor Cleaning',
     slug: 'floor-cleaning',
     description: 'White phenyl floor-cleaning solutions for routine household hygiene and lasting fragrance.',
-    imageUrl: '/images/products/vulmora-white-phenyl-1l.jpg',
+    imageUrl: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052372/vulmora_store/products/vulmora-white-phenyl-floor-cleaner-1l.jpg',
     status: 'active' as const,
   },
   {
     name: 'Personal Care',
     slug: 'personal-care',
     description: 'Pure skin softeners and hydrating care for dry skin throughout the year.',
-    imageUrl: '/images/products/glycerin-ip-50g.jpg',
+    imageUrl: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052374/vulmora_store/products/glycerin-ip-50g.jpg',
     status: 'active' as const,
   },
 ];
@@ -44,7 +44,7 @@ export const VULMORA_INITIAL_PRODUCTS = [
     status: 'active' as const,
     images: [
       {
-        url: '/images/products/vulmora-washing-powder.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052371/vulmora_store/products/vulmora-washing-powder.jpg',
         altText: 'VULMORA Washing Powder Pack',
         isPrimary: true,
       },
@@ -75,7 +75,7 @@ export const VULMORA_INITIAL_PRODUCTS = [
     status: 'active' as const,
     images: [
       {
-        url: '/images/products/vulmora-white-phenyl-1l.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052372/vulmora_store/products/vulmora-white-phenyl-floor-cleaner-1l.jpg',
         altText: 'VULMORA White Phenyl Floor Cleaner 1L Bottle',
         isPrimary: true,
       },
@@ -105,12 +105,12 @@ export const VULMORA_INITIAL_PRODUCTS = [
     status: 'active' as const,
     images: [
       {
-        url: '/images/products/glycerin-ip-50g.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052374/vulmora_store/products/glycerin-ip-50g.jpg',
         altText: 'Glycerin I.P. 50 g Bottle and Carton',
         isPrimary: true,
       },
       {
-        url: '/images/products/glycerin-ip-labels.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052377/vulmora_store/products/glycerin-labels.jpg',
         altText: 'Glycerin I.P. Certified Batch Packaging Label',
       },
     ],
@@ -141,12 +141,12 @@ export const VULMORA_INITIAL_PRODUCTS = [
     status: 'active' as const,
     images: [
       {
-        url: '/images/products/glycerin-ip-100g.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052375/vulmora_store/products/glycerin-ip-100g.jpg',
         altText: 'Glycerin I.P. 100 g Bottle and Carton Showcase',
         isPrimary: true,
       },
       {
-        url: '/images/products/glycerin-ip-labels.jpg',
+        url: 'https://res.cloudinary.com/j66acpd8/image/upload/v1792052377/vulmora_store/products/glycerin-labels.jpg',
         altText: 'Glycerin I.P. 100 g Packaging Label',
       },
     ],
