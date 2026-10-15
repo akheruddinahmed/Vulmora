@@ -325,6 +325,7 @@ export async function cancelOrderSafely(
   const orderRef = doc(db, ORDERS_COLLECTION, orderId);
 
   await runTransaction(db, async (transaction) => {
+    // 1. All Reads First
     const snap = await transaction.get(orderRef);
     if (!snap.exists()) throw new Error('Order not found');
 
@@ -338,7 +339,17 @@ export async function cancelOrderSafely(
       throw new Error('Cannot cancel an order that has already been delivered.');
     }
 
-    // Restore stock ONLY if not already restored
+    interface RestorationTask {
+      prodRef: any;
+      logRef: any;
+      item: any;
+      currentStock: number;
+      restoredStock: number;
+    }
+
+    const restorations: RestorationTask[] = [];
+
+    // Read all products before performing any writes
     if (!order.inventoryRestored && order.items && order.items.length > 0) {
       for (const item of order.items) {
         const prodRef = doc(db, PRODUCTS_COLLECTION, item.productId);
@@ -347,30 +358,40 @@ export async function cancelOrderSafely(
         if (prodSnap.exists()) {
           const currentStock = prodSnap.data().stock || 0;
           const restoredStock = currentStock + item.quantity;
-
-          transaction.update(prodRef, {
-            stock: restoredStock,
-            updatedAt: serverTimestamp(),
-          });
-
-          // Log inventory restoration
           const logRef = doc(collection(db, INVENTORY_LOGS_COLLECTION));
-          transaction.set(logRef, {
-            productId: item.productId,
-            productName: item.productName,
-            sku: item.sku,
-            quantityBefore: currentStock,
-            quantityAfter: restoredStock,
-            quantityChange: item.quantity,
-            reason: 'ORDER_CANCELLED',
-            actorUid: adminUid,
-            actorEmail: adminEmail,
-            relatedOrderId: order.orderId,
-            notes: `Stock restored upon order cancellation: ${reason}`,
-            createdAt: serverTimestamp(),
+
+          restorations.push({
+            prodRef,
+            logRef,
+            item,
+            currentStock,
+            restoredStock,
           });
         }
       }
+    }
+
+    // 2. All Writes Second
+    for (const task of restorations) {
+      transaction.update(task.prodRef, {
+        stock: task.restoredStock,
+        updatedAt: serverTimestamp(),
+      });
+
+      transaction.set(task.logRef, {
+        productId: task.item.productId,
+        productName: task.item.productName,
+        sku: task.item.sku,
+        quantityBefore: task.currentStock,
+        quantityAfter: task.restoredStock,
+        quantityChange: task.item.quantity,
+        reason: 'ORDER_CANCELLED',
+        actorUid: adminUid,
+        actorEmail: adminEmail,
+        relatedOrderId: order.orderId,
+        notes: `Stock restored upon order cancellation: ${reason}`,
+        createdAt: serverTimestamp(),
+      });
     }
 
     const cancelEntry: StatusHistoryEntry = {
