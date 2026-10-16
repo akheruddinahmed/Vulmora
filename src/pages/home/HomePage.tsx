@@ -20,6 +20,7 @@ import { ProductGridSkeleton } from '@/components/common/LoadingSkeleton';
 import { EmptyState } from '@/components/common/EmptyState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
+import { SKLogo } from '@/components/common/SKLogo';
 
 export const HomePage: React.FC = () => {
   const { isAdmin } = useAuth();
@@ -166,6 +167,27 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Official S K Research Laboratories Manufacturer Trust Bar */}
+      <section className="bg-slate-900 border-b border-slate-800 py-3.5 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <div className="bg-white px-2 py-1 rounded-xl shadow-xs shrink-0 flex items-center justify-center">
+              <SKLogo variant="logo-only" size="xs" className="h-6" />
+            </div>
+            <p className="text-xs text-slate-300 font-medium">
+              Formulated & Manufactured by <strong className="text-white font-bold">S K Research Laboratories</strong> • Guwahati, Assam
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span className="text-emerald-400 flex items-center gap-1.5">✓ Drug License Standard</span>
+            <span className="text-blue-400 flex items-center gap-1.5">✓ Direct Lab Dispatch</span>
+            <Link to="/about" className="text-white hover:text-blue-300 transition-colors underline underline-offset-4">
+              Learn More →
+            </Link>
           </div>
         </div>
       </section>

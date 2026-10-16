@@ -18,6 +18,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { useToast } from '@/contexts/ToastContext';
+import { SKLogo } from '@/components/common/SKLogo';
 
 interface ContactFormData {
   name: string;
@@ -175,20 +176,33 @@ export const ContactUsPage: React.FC = () => {
               </div>
 
               {/* Registered Laboratory & Manufacturing Facility */}
-              <div className="flex items-start gap-4 pt-4 border-t border-slate-100">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5" />
+              <div className="pt-4 border-t border-slate-100 space-y-3">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Manufacturer & Dispatch Hub
+                    </h3>
+                    <p className="text-xs font-semibold text-slate-800 mt-0.5 leading-relaxed">
+                      {settings.storeAddress}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Formulated & Dispatched by S K Research Laboratories
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Manufacturer & Dispatch Hub
-                  </h3>
-                  <p className="text-xs font-semibold text-slate-800 mt-0.5 leading-relaxed">
-                    {settings.storeAddress}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Operated by S K Research Laboratories
-                  </p>
+
+                {/* S K Research Laboratories Official Brand Badge */}
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3">
+                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-2xs shrink-0">
+                    <SKLogo variant="logo-only" size="sm" className="h-8" />
+                  </div>
+                  <div className="text-[11px] text-slate-600 leading-tight">
+                    <strong className="text-slate-900 block font-bold">S K Research Laboratories</strong>
+                    <span>Pharmaceutical & chemical quality assurance facility</span>
+                  </div>
                 </div>
               </div>
 

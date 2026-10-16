@@ -11,6 +11,7 @@ import {
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { useToast } from '@/contexts/ToastContext';
 import { VulmoraLogo } from './VulmoraLogo';
+import { SKLogo } from './SKLogo';
 
 export const Footer: React.FC = () => {
   const { settings } = useStoreSettings();
@@ -71,6 +72,19 @@ export const Footer: React.FC = () => {
             <p className="text-xs text-slate-400 leading-relaxed">
               VULMORA delivers trusted everyday household cleaning and personal care solutions. From Power 3X laundry care to floral floor cleaners and pure Glycerin I.P.
             </p>
+
+            {/* Official Manufacturer Endorsement */}
+            <div className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center gap-3">
+              <div className="bg-white p-1.5 rounded-xl shrink-0">
+                <SKLogo variant="logo-only" size="xs" className="h-7" />
+              </div>
+              <div className="text-[11px] text-slate-300">
+                <span className="block text-[9px] uppercase font-bold tracking-wider text-slate-400">
+                  Formulated & Manufactured by
+                </span>
+                <span className="font-extrabold text-white">S K Research Laboratories</span>
+              </div>
+            </div>
             <div className="space-y-2 text-xs text-slate-400 pt-1">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />

@@ -19,6 +19,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { SKLogo } from '@/components/common/SKLogo';
 
 export const AdminLayout: React.FC = () => {
   const location = useLocation();
@@ -91,6 +92,23 @@ export const AdminLayout: React.FC = () => {
             );
           })}
         </nav>
+
+        {/* Manufacturer & Dispatch Facility Badge */}
+        <div className="p-3 border-t border-slate-800 bg-slate-950/40">
+          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2.5">
+            <div className="bg-white p-1 rounded-lg shrink-0">
+              <SKLogo variant="logo-only" size="xs" className="h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400 leading-tight">
+                Operating Facility
+              </p>
+              <p className="text-[11px] font-extrabold text-white truncate leading-tight">
+                S K Research Laboratories
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Footer info & Logout */}
         <div className="p-4 border-t border-slate-800 space-y-3">

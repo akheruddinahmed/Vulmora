@@ -18,6 +18,7 @@ import { formatINR, calculateDiscountPercentage } from '@/utils/formatters';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import { ProductCard } from '@/components/common/ProductCard';
+import { SKLogo } from '@/components/common/SKLogo';
 
 export const ProductDetailsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -369,6 +370,21 @@ export const ProductDetailsPage: React.FC = () => {
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                 <RotateCcw className="w-4 h-4 mx-auto mb-1 text-fuchsia-700" />
                 <span>7-Day Easy Return</span>
+              </div>
+            </div>
+
+            {/* Manufacturer Guarantee Badge */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-emerald-50/60 border border-blue-100 flex items-center gap-3.5">
+              <div className="bg-white p-2 rounded-xl border border-blue-200/60 shadow-xs shrink-0">
+                <SKLogo variant="logo-only" size="sm" className="h-7 sm:h-8" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 leading-tight">
+                  Formulated & Guaranteed by S K Research Laboratories
+                </p>
+                <p className="text-xs text-slate-600 leading-tight mt-0.5">
+                  Direct dispatch from licensed research laboratory in Guwahati, Assam.
+                </p>
               </div>
             </div>
           </div>

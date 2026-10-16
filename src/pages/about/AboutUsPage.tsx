@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useStoreSettings } from '@/contexts/StoreSettingsContext';
 import { VulmoraLogo } from '@/components/common/VulmoraLogo';
+import { SKLogo } from '@/components/common/SKLogo';
 
 export const AboutUsPage: React.FC = () => {
   const { settings } = useStoreSettings();
@@ -159,8 +160,9 @@ export const AboutUsPage: React.FC = () => {
               <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
               
               <div className="space-y-6 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-blue-300">
-                  <Award className="w-6 h-6" />
+                {/* Official S K Research Laboratories Logo Badge */}
+                <div className="p-3 sm:p-4 bg-white rounded-2xl shadow-lg border border-white/20 inline-flex items-center">
+                  <SKLogo variant="logo-only" size="lg" className="h-12 sm:h-14" />
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
@@ -256,6 +258,11 @@ export const AboutUsPage: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Official Manufacturer Endorsement Banner */}
+        <div className="mt-12">
+          <SKLogo variant="banner" theme="light" />
         </div>
       </section>
 
